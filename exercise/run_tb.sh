@@ -1,9 +1,9 @@
 #!/bin/bash
 
 iverilog -g2012                  \
+         -DDUALPORT_LATENCY_5    \
          ../fifo_tb.sv           \
          ../dff_fifo/fifo_dff.sv \
          ../sram_fifo/*          \
-         ./*.sv                  \
-         -DDUALPORT_LATENCY_5
+         ./*.sv
 vvp a.out
