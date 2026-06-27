@@ -12,4 +12,28 @@ module fifo_dualport_with_pipelined_sram #(
     output logic             full_o
 );
 
+    always_comb begin   :   data_out_MUX
+
+    end :   data_out_MUX
+
+    always_comb begin   :   wen_logic
+
+    end :   wen_logic
+
+    always_comb begin   :   write_pointer_logic
+
+    end :   write_pointer_logic
+
+    always_comb begin   :   write_pointer_register
+
+    end :   write_pointer_register
+
+    always_comb begin   :   read_pointer_logic
+
+    end :   read_pointer_logic
+
+    always_comb begin   :   read_pointer_register
+
+    end :   read_pointer_register
+
 endmodule
