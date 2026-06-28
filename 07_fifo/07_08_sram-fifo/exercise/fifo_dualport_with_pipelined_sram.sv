@@ -12,6 +12,8 @@ module fifo_dualport_with_pipelined_sram #(
     output logic             full_o
 );
 
+    localparam int LATENCY = 5;
+
     sram_dualport_latency_5 #(
         .WIDTH ( WIDTH ),
         .DEPTH ( DEPTH )
@@ -25,6 +27,34 @@ module fifo_dualport_with_pipelined_sram #(
         .data_i  (data_i),
         .data_o  (data_o),
         .vld_o   ()
+    );
+
+    flip_flop_fifo_with_counter #(
+        .width(WIDTH),
+        .depth(LATENCY)
+    ) buffer_in (
+        .clk(clk_i),
+        .rst(rst_i),
+        .push(),
+        .pop(),
+        .write_data(),
+        .read_data(),
+        .empty(),
+        .full()
+    );
+
+    flip_flop_fifo_with_counter #(
+        .width(WIDTH),
+        .depth(LATENCY)
+    ) buffer_out (
+        .clk(clk_i),
+        .rst(rst_i),
+        .push(),
+        .pop(),
+        .write_data(),
+        .read_data(),
+        .empty(),
+        .full()
     );
 
     always_comb begin   :   data_out_MUX
