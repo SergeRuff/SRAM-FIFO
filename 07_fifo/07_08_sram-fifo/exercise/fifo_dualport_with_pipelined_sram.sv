@@ -12,6 +12,21 @@ module fifo_dualport_with_pipelined_sram #(
     output logic             full_o
 );
 
+    sram_dualport_latency_5 #(
+        .WIDTH ( WIDTH ),
+        .DEPTH ( DEPTH )
+    ) i_mem (
+        .clk_i   (clk_i),
+        .rst_i   (rst_i),
+        .wen_i   (),
+        .ren_i   (),
+        .waddr_i (),
+        .raddr_i (),
+        .data_i  (data_i),
+        .data_o  (data_o),
+        .vld_o   ()
+    );
+
     always_comb begin   :   data_out_MUX
 
     end :   data_out_MUX
