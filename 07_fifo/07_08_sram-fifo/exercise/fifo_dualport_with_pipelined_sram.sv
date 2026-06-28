@@ -36,4 +36,13 @@ module fifo_dualport_with_pipelined_sram #(
 
     end :   read_pointer_register
 
+    always_comb begin   :   empty_flag_logic
+        
+    end : empty_flag_logic
+    
+    always_comb begin   :   full_flag_logic
+        
+    end :   full_flag_logic
+    
+
 endmodule
