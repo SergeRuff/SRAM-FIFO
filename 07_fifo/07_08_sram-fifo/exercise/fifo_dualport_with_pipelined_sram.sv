@@ -19,7 +19,7 @@ module fifo_dualport_with_pipelined_sram #(
 
     logic sram_wen;
     logic sram_ren;
-    
+
     logic wr_ptr;
     logic wr_ptr_reg;
     logic rd_ptr;
@@ -68,6 +68,10 @@ module fifo_dualport_with_pipelined_sram #(
         .full()
     );
 
+    always_comb begin   :   data_in_MUX
+        
+    end :   data_in_MUX
+
     always_comb begin   :   data_out_MUX
 
     end :   data_out_MUX
@@ -99,10 +103,10 @@ module fifo_dualport_with_pipelined_sram #(
     always_comb begin   :   empty_flag_logic
         
     end : empty_flag_logic
-    
+
     always_comb begin   :   full_flag_logic
         
     end :   full_flag_logic
-    
+
 
 endmodule
