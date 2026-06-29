@@ -25,6 +25,13 @@ module fifo_dualport_with_pipelined_sram #(
     logic rd_ptr;
     logic rd_ptr_reg;
 
+    logic sram_data_vld;
+
+    logic [WIDTH-1:0] sram_data_o;
+
+    logic [WIDTH-1:0] input_buf_data_o;
+    logic [WIDTH-1:0] out_buf_data_i;
+
     sram_dualport_latency_5 #(
         .WIDTH ( WIDTH ),
         .DEPTH ( DEPTH )
@@ -33,11 +40,11 @@ module fifo_dualport_with_pipelined_sram #(
         .rst_i   (rst_i),
         .wen_i   (sram_wen),
         .ren_i   (sram_ren),
-        .waddr_i (),
-        .raddr_i (),
-        .data_i  (data_i),
-        .data_o  (data_o),
-        .vld_o   ()
+        .waddr_i (wr_ptr_reg),
+        .raddr_i (rd_ptr_reg),
+        .data_i  (input_buf_data_o),
+        .data_o  (sram_data_o),
+        .vld_o   (sram_data_vld)
     );
 
     flip_flop_fifo_with_counter #(
@@ -48,8 +55,8 @@ module fifo_dualport_with_pipelined_sram #(
         .rst(rst_i),
         .push(),
         .pop(),
-        .write_data(),
-        .read_data(),
+        .write_data(data_i),
+        .read_data(input_buf_data_o),
         .empty(),
         .full()
     );
@@ -62,19 +69,15 @@ module fifo_dualport_with_pipelined_sram #(
         .rst(rst_i),
         .push(),
         .pop(),
-        .write_data(),
-        .read_data(),
+        .write_data(out_buf_data_i),
+        .read_data(data_o),
         .empty(),
         .full()
     );
 
-    always_comb begin   :   data_in_MUX
-        
-    end :   data_in_MUX
+    always_comb begin   :   data_MUX
 
-    always_comb begin   :   data_out_MUX
-
-    end :   data_out_MUX
+    end :   data_MUX
 
     always_comb begin   :   wen_logic
 
