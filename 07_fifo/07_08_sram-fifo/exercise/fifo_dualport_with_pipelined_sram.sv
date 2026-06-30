@@ -87,6 +87,22 @@ module fifo_dualport_with_pipelined_sram #(
 
     end :   wen_logic
 
+    always_comb begin   :   buffer_in_write_logic
+        
+    end : buffer_in_write_logic
+
+    always_comb begin   :   buffer_in_read_logic
+        
+    end : buffer_in_read_logic
+
+    always_comb begin   :   buffer_out_write_logic
+        
+    end : buffer_out_write_logic
+
+    always_comb begin   :   buffer_out_read_logic
+        
+    end : buffer_out_read_logic
+
     always_comb begin   :   write_pointer_logic
                         wr_ptr = wr_ptr_reg;
         if (sram_wen)   wr_ptr = (wr_ptr==MAX_PTR)? '0 : wr_ptr + 1;
