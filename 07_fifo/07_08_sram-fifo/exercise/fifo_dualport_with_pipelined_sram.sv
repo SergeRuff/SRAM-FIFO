@@ -20,15 +20,15 @@ module fifo_dualport_with_pipelined_sram #(
     logic sram_wen;
     logic sram_ren;
 
-    logic wr_ptr;
-    logic wr_ptr_reg;
-    logic rd_ptr;
-    logic rd_ptr_reg;
+    logic [COUNTER_WIDTH - 1:0] sram_cnt;
+    logic [POINTER_WIDTH - 1:0] wr_ptr;
+    logic [POINTER_WIDTH - 1:0] wr_ptr_reg;
+    logic [POINTER_WIDTH - 1:0] rd_ptr;
+    logic [POINTER_WIDTH - 1:0] rd_ptr_reg;
 
     logic sram_data_vld;
 
     logic [WIDTH-1:0] sram_data_o;
-
     logic [WIDTH-1:0] input_buf_data_o;
     logic [WIDTH-1:0] out_buf_data_i;
 
