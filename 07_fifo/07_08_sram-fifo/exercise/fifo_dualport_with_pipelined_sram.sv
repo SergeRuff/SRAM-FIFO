@@ -27,6 +27,10 @@ module fifo_dualport_with_pipelined_sram #(
     logic [POINTER_WIDTH - 1:0] rd_ptr_reg;
 
     logic sram_data_vld;
+    logic input_buf_full;
+    logic input_buf_empty;
+    logic output_buf_full;
+    logic output_buf_empty;
 
     logic [WIDTH-1:0] sram_data_o;
     logic [WIDTH-1:0] input_buf_data_o;
@@ -58,7 +62,7 @@ module fifo_dualport_with_pipelined_sram #(
         .write_data(data_i),
         .read_data(input_buf_data_o),
         .empty(),
-        .full()
+        .full(input_buf_full)
     );
 
     flip_flop_fifo_with_counter #(
@@ -72,7 +76,7 @@ module fifo_dualport_with_pipelined_sram #(
         .write_data(out_buf_data_i),
         .read_data(data_o),
         .empty(),
-        .full()
+        .full(output_buf_full)
     );
 
     always_comb begin   :   data_MUX
@@ -104,12 +108,15 @@ module fifo_dualport_with_pipelined_sram #(
     end :   read_pointer_register
 
     always_comb begin   :   empty_flag_logic
-        
+        empty_o = input_buf_full    &
+                  (sram_cnt == '0)  &
+                  output_buf_empty;
     end : empty_flag_logic
 
     always_comb begin   :   full_flag_logic
-        
+        full_o = input_buf_full                      &
+                 (sram_cnt == COUNTER_WIDTH'(DEPTH)) &
+                 output_buf_full;
     end :   full_flag_logic
-
 
 endmodule
