@@ -83,9 +83,13 @@ module fifo_dualport_with_pipelined_sram #(
 
     end :   data_MUX
 
-    always_comb begin   :   wen_logic
+    always_comb begin   :   sram_wen_logic
 
-    end :   wen_logic
+    end :   sram_wen_logic
+
+    always_comb begin   :   sram_ren_logic
+
+    end :   sram_ren_logic
 
     always_comb begin   :   buffer_in_write_logic
         
