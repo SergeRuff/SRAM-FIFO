@@ -79,9 +79,9 @@ module fifo_dualport_with_pipelined_sram #(
         .full(output_buf_full)
     );
 
-    always_comb begin   :   data_MUX
+    always_comb begin   :   output_buffer_in_data_MUX
 
-    end :   data_MUX
+    end :   output_buffer_in_data_MUX
 
     always_comb begin   :   sram_wen_logic
 
@@ -91,21 +91,21 @@ module fifo_dualport_with_pipelined_sram #(
 
     end :   sram_ren_logic
 
-    always_comb begin   :   buffer_in_write_logic
+    always_comb begin   :   input_buffer_write_logic
         
-    end : buffer_in_write_logic
+    end : input_buffer_write_logic
 
-    always_comb begin   :   buffer_in_read_logic
+    always_comb begin   :   input_buffer_read_logic
         
-    end : buffer_in_read_logic
+    end : input_buffer_read_logic
 
-    always_comb begin   :   buffer_out_write_logic
+    always_comb begin   :   output_buffer_write_logic
         
-    end : buffer_out_write_logic
+    end : output_buffer_write_logic
 
-    always_comb begin   :   buffer_out_read_logic
+    always_comb begin   :   output_buffer_read_logic
         
-    end : buffer_out_read_logic
+    end : output_buffer_read_logic
 
     always_comb begin   :   write_pointer_logic
                         wr_ptr = wr_ptr_reg;
