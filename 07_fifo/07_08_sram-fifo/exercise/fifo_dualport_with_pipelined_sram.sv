@@ -128,14 +128,16 @@ module fifo_dualport_with_pipelined_sram #(
     end :   read_pointer_register
 
     always_comb begin   :   empty_flag_logic
-        empty_o = input_buf_full    &
-                  (sram_cnt == '0)  &
+        sram_empty = (sram_cnt == '0);
+        empty_o = input_buf_full   &
+                  sram_empty       &
                   output_buf_empty;
     end : empty_flag_logic
 
     always_comb begin   :   full_flag_logic
-        full_o = input_buf_full                      &
-                 (sram_cnt == COUNTER_WIDTH'(DEPTH)) &
+        sram_full = sram_cnt == COUNTER_WIDTH'(DEPTH);
+        full_o = input_buf_full  &
+                 sram_full       &
                  output_buf_full;
     end :   full_flag_logic
 
