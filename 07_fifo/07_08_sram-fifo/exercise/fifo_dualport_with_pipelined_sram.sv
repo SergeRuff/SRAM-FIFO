@@ -27,6 +27,11 @@ module fifo_dualport_with_pipelined_sram #(
     logic [POINTER_WIDTH - 1:0] rd_ptr_reg;
 
     logic sram_data_vld;
+    logic sram_empty;
+    logic sram_full;
+
+    logic input_buf_pop;
+    logic input_buf_push;
     logic input_buf_full;
     logic input_buf_empty;
 
@@ -82,6 +87,12 @@ module fifo_dualport_with_pipelined_sram #(
         .empty(),
         .full(output_buf_full)
     );
+
+    always_ff @(posedge clk_i) begin    :   sram_busy_counter
+        if (rst_i)                      sram_cnt <= '0;
+        else if (sram_wen & ~sram_ren)  sram_cnt <= sram_cnt + 1'b1;
+        else if (~sram_wen & sram_ren)  sram_cnt <= sram_cnt - 1'b1;
+    end :   sram_busy_counter
 
     always_comb begin   :   output_buffer_in_data_MUX
 
