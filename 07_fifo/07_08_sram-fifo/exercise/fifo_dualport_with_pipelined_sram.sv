@@ -94,9 +94,9 @@ module fifo_dualport_with_pipelined_sram #(
         else if (~sram_wen & sram_ren)  sram_cnt <= sram_cnt - 1'b1;
     end :   sram_busy_counter
 
-    always_comb begin   :   output_buffer_in_data_MUX
-
-    end :   output_buffer_in_data_MUX
+    always_ff @(posedge clk_i) begin    :   sram_busy_flags_logic
+        
+    end : sram_busy_flags_logic
 
     always_comb begin   :   sram_wen_logic
 
@@ -105,6 +105,10 @@ module fifo_dualport_with_pipelined_sram #(
     always_comb begin   :   sram_ren_logic
 
     end :   sram_ren_logic
+
+    always_comb begin   :   output_buffer_in_data_MUX
+
+    end :   output_buffer_in_data_MUX
 
     always_comb begin   :   input_buffer_write_logic
         
