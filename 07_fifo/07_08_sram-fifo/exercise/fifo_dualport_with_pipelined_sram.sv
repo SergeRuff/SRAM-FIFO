@@ -23,7 +23,8 @@ module fifo_dualport_with_pipelined_sram #(
     logic [POINTER_WIDTH - 1:0] rd_ptr;
     logic [POINTER_WIDTH - 1:0] rd_ptr_reg;
 
-    logic bypass_mode;
+    logic sram_only_bypass_mode;
+    logic total_bypass_mode;
 
     logic sram_wen;
     logic sram_ren;
@@ -121,7 +122,7 @@ module fifo_dualport_with_pipelined_sram #(
     always_comb begin   :   input_buffer_write_logic
         input_buf_push = '0;
         input_buf_wr_ready = (input_buf_pop | !input_buf_full);
-        if (input_buf_wr_ready & !bypass_mode) begin
+        if (input_buf_wr_ready & !total_bypass_mode) begin
             if (wr_en_i)    input_buf_push = '1;
         end
     end : input_buffer_write_logic
