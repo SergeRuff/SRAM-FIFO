@@ -109,6 +109,10 @@ module fifo_dualport_with_pipelined_sram #(
 
     end :   sram_ren_logic
 
+    always_comb begin   :   bypass_mode_logic
+        
+    end :   bypass_mode_logic
+
     always_comb begin   :   output_buffer_in_data_MUX
 
     end :   output_buffer_in_data_MUX
