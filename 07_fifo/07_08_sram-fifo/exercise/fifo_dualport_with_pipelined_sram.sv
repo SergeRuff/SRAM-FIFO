@@ -17,14 +17,16 @@ module fifo_dualport_with_pipelined_sram #(
     localparam int COUNTER_WIDTH = $clog2(DEPTH+1);
     localparam int MAX_PTR = POINTER_WIDTH'(DEPTH-1);
 
-    logic sram_wen;
-    logic sram_ren;
-
     logic [COUNTER_WIDTH - 1:0] sram_cnt;
     logic [POINTER_WIDTH - 1:0] wr_ptr;
     logic [POINTER_WIDTH - 1:0] wr_ptr_reg;
     logic [POINTER_WIDTH - 1:0] rd_ptr;
     logic [POINTER_WIDTH - 1:0] rd_ptr_reg;
+
+    logic bypass_mode;
+
+    logic sram_wen;
+    logic sram_ren;
 
     logic sram_data_vld;
     logic sram_empty;
@@ -34,6 +36,7 @@ module fifo_dualport_with_pipelined_sram #(
     logic input_buf_push;
     logic input_buf_full;
     logic input_buf_empty;
+    logic input_buf_wr_ready;
 
     logic output_buf_pop;
     logic output_buf_push;
@@ -111,7 +114,11 @@ module fifo_dualport_with_pipelined_sram #(
     end :   output_buffer_in_data_MUX
 
     always_comb begin   :   input_buffer_write_logic
-        
+        input_buf_push = '0;
+        input_buf_wr_ready = (input_buf_pop | !input_buf_full);
+        if (input_buf_wr_ready & !bypass_mode) begin
+            if (wr_en_i)    input_buf_push = '1;
+        end
     end : input_buffer_write_logic
 
     always_comb begin   :   input_buffer_read_logic
