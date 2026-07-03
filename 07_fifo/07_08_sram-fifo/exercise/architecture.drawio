@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="QcGKXK7asueffZO4LGBf" name="Page-1">
-        <mxGraphModel dx="2332" dy="811" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="2686" dy="854" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -90,37 +90,43 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="28" value="" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;container=1;collapsible=0;kind=output;drawPins=0;left=1;right=0;bottom=0;top=0;" vertex="1" parent="1">
+                <mxCell id="28" value="" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;container=1;collapsible=0;kind=output;drawPins=0;left=1;right=0;bottom=0;top=0;" parent="1" vertex="1">
                     <mxGeometry x="1240" y="360" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="30" style="edgeStyle=none;html=1;entryX=0;entryY=0;entryDx=0;entryDy=20;entryPerimeter=0;" edge="1" parent="1" target="28">
+                <mxCell id="30" style="edgeStyle=none;html=1;entryX=0;entryY=0;entryDx=0;entryDy=20;entryPerimeter=0;" parent="1" target="28" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="1110" y="380" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="31" value="" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;left=,:clk;right=,:np;top=0;bottom=0;drawPins=0;snapToPoint=1;resizable=0;editable=1;" vertex="1" parent="1">
+                <mxCell id="31" value="" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;left=,:clk;right=,:np;top=0;bottom=0;drawPins=0;snapToPoint=1;resizable=0;editable=1;" parent="1" vertex="1">
                     <mxGeometry x="420" y="210" width="40" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="32" value="" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;left=,:clk;right=,:np;top=0;bottom=0;drawPins=0;snapToPoint=1;resizable=0;editable=1;" vertex="1" parent="1">
+                <mxCell id="32" value="" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;left=,:clk;right=,:np;top=0;bottom=0;drawPins=0;snapToPoint=1;resizable=0;editable=1;" parent="1" vertex="1">
                     <mxGeometry x="580" y="210" width="40" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="33" value="WR&lt;div&gt;PTR&lt;/div&gt;" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;container=1;collapsible=0;kind=sequential;drawPins=0;left=3;right=2;bottom=0;top=0;" vertex="1" parent="1">
+                <mxCell id="33" value="WR&lt;div&gt;PTR&lt;/div&gt;" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;container=1;collapsible=0;kind=sequential;drawPins=0;left=3;right=2;bottom=0;top=0;" parent="1" vertex="1">
                     <mxGeometry x="420" y="150" width="40" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="34" value="RD&lt;div&gt;PTR&lt;/div&gt;" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;container=1;collapsible=0;kind=sequential;drawPins=0;left=3;right=2;bottom=0;top=0;" vertex="1" parent="1">
+                <mxCell id="34" value="RD&lt;div&gt;PTR&lt;/div&gt;" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;container=1;collapsible=0;kind=sequential;drawPins=0;left=3;right=2;bottom=0;top=0;" parent="1" vertex="1">
                     <mxGeometry x="580" y="150" width="40" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="38" value="" style="endArrow=classic;html=1;exitX=0.496;exitY=1.005;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.13;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="31" target="10">
+                <mxCell id="38" value="" style="endArrow=classic;html=1;exitX=0.496;exitY=1.005;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.13;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="31" target="10" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="460" y="310" as="sourcePoint"/>
                         <mxPoint x="510" y="260" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="39" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                <mxCell id="39" value="" style="endArrow=classic;html=1;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="600" y="270" as="sourcePoint"/>
                         <mxPoint x="600" y="340" as="targetPoint"/>
                     </mxGeometry>
+                </mxCell>
+                <mxCell id="40" value="Bypass&lt;div&gt;Logic&lt;/div&gt;" style="externalPins=0;recursiveResize=0;shadow=0;dashed=0;align=center;html=1;strokeWidth=1;shape=mxgraph.rtl.abstract.entity;container=1;collapsible=0;kind=combinational;drawPins=0;left=3;right=2;bottom=0;top=0;rotation=0;" parent="1" vertex="1">
+                    <mxGeometry x="755" y="720" width="80" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="44" style="edgeStyle=none;html=1;entryX=0.506;entryY=0.877;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="40" target="23" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
