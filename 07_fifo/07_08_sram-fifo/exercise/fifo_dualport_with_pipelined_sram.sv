@@ -45,6 +45,7 @@ module fifo_dualport_with_pipelined_sram #(
     logic output_buf_full;
     logic output_buf_empty;
     logic output_buf_wr_ready;
+    logic output_buf_rd_ready;
 
     logic [WIDTH-1:0] sram_data_o;
     logic [WIDTH-1:0] input_buf_data_o;
@@ -146,7 +147,11 @@ module fifo_dualport_with_pipelined_sram #(
     end : output_buffer_write_logic
 
     always_comb begin   :   output_buffer_read_logic
-        
+        output_buf_pop = '0;
+        output_buf_rd_ready = !output_buf_empty;
+        if (output_buf_rd_ready)    begin
+            if (rd_en_i)    output_buf_pop = '1;
+        end
     end : output_buffer_read_logic
 
     always_comb begin   :   write_pointer_logic
