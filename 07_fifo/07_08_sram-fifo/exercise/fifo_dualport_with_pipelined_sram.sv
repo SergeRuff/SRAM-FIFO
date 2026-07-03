@@ -115,11 +115,7 @@ module fifo_dualport_with_pipelined_sram #(
     always_comb begin   :   bypass_mode_logic
         
     end :   bypass_mode_logic
-
-    always_comb begin   :   output_buffer_in_data_MUX
-
-    end :   output_buffer_in_data_MUX
-
+    
     always_comb begin   :   input_buffer_write_logic
         input_buf_push = '0;
         input_buf_wr_ready = (input_buf_pop | !input_buf_full);
@@ -127,7 +123,7 @@ module fifo_dualport_with_pipelined_sram #(
             if (wr_en_i)    input_buf_push = '1;
         end
     end : input_buffer_write_logic
-
+    
     always_comb begin   :   input_buffer_read_logic
         input_buf_pop = '0;
         input_buf_rd_ready = (!sram_full & !input_buf_empty);
@@ -135,6 +131,12 @@ module fifo_dualport_with_pipelined_sram #(
             input_buf_pop = '1;
         end
     end : input_buffer_read_logic
+
+    always_comb begin   :   output_buffer_in_data_MUX
+        out_buf_data_i = sram_data_o;
+        if      (sram_only_bypass_mode) out_buf_data_i = input_buf_data_o;
+        else if (total_bypass_mode)     out_buf_data_i = data_i;
+    end :   output_buffer_in_data_MUX
 
     always_comb begin   :   output_buffer_write_logic
         output_buf_push = '0;
