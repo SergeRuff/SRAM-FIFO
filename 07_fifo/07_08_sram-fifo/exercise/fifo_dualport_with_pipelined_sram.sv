@@ -178,9 +178,7 @@ module fifo_dualport_with_pipelined_sram #(
 
     always_comb begin   :   empty_flag_logic
         sram_empty = (sram_cnt == '0);
-        empty_o = input_buf_empty   &
-                  sram_empty       &
-                  output_buf_empty;
+        empty_o = output_buf_empty;
     end : empty_flag_logic
 
     always_comb begin   :   full_flag_logic
