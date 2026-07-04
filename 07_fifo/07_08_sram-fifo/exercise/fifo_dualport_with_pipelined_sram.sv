@@ -78,11 +78,11 @@ module fifo_dualport_with_pipelined_sram #(
     ) buffer_in (
         .clk(clk_i),
         .rst(rst_i),
-        .push(),
-        .pop(),
+        .push(input_buf_push),
+        .pop(input_buf_pop),
         .write_data(data_i),
         .read_data(input_buf_data_o),
-        .empty(),
+        .empty(input_buf_empty),
         .full(input_buf_full)
     );
 
@@ -92,11 +92,11 @@ module fifo_dualport_with_pipelined_sram #(
     ) buffer_out (
         .clk(clk_i),
         .rst(rst_i),
-        .push(),
-        .pop(),
+        .push(output_buf_push),
+        .pop(output_buf_pop),
         .write_data(out_buf_data_i),
         .read_data(data_o),
-        .empty(),
+        .empty(output_buf_empty),
         .full(output_buf_full)
     );
 
