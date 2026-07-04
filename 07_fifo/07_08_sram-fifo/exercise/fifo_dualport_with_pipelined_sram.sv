@@ -16,6 +16,7 @@ module fifo_dualport_with_pipelined_sram #(
     localparam int POINTER_WIDTH = $clog2(DEPTH);
     localparam int COUNTER_WIDTH = $clog2(DEPTH+1);
     localparam int MAX_PTR = POINTER_WIDTH'(DEPTH-1);
+    localparam int LATENCY_COUNTER_WIDTH = $clog2(LATENCY);
 
     logic [COUNTER_WIDTH - 1:0] sram_cnt;
     logic [POINTER_WIDTH - 1:0] wr_ptr;
@@ -53,6 +54,8 @@ module fifo_dualport_with_pipelined_sram #(
     logic [WIDTH-1:0] input_buf_data_o;
     logic [WIDTH-1:0] out_buf_data_i;
 
+    logic [LATENCY_COUNTER_WIDTH - 1:0] sram_wr_latency_cnt;
+
     sram_dualport_latency_5 #(
         .WIDTH ( WIDTH ),
         .DEPTH ( DEPTH )
@@ -70,7 +73,7 @@ module fifo_dualport_with_pipelined_sram #(
 
     flip_flop_fifo_with_counter #(
         .width(WIDTH),
-        .depth(LATENCY)
+        .depth(LATENCY*2)
     ) buffer_in (
         .clk(clk_i),
         .rst(rst_i),
@@ -84,7 +87,7 @@ module fifo_dualport_with_pipelined_sram #(
 
     flip_flop_fifo_with_counter #(
         .width(WIDTH),
-        .depth(LATENCY)
+        .depth(LATENCY*2)
     ) buffer_out (
         .clk(clk_i),
         .rst(rst_i),
@@ -102,9 +105,24 @@ module fifo_dualport_with_pipelined_sram #(
         else if (~sram_wen & sram_ren)  sram_cnt <= sram_cnt - 1'b1;
     end :   sram_busy_counter
 
-    always_ff @(posedge clk_i) begin    :   sram_busy_flags_logic
-        
-    end : sram_busy_flags_logic
+    always_ff @(posedge clk_i) begin    :   sram_write_busy_flag_logic
+        if (rst_i)  begin
+            sram_wr_busy <= '0;
+            sram_wr_latency_cnt <= '0;
+        end
+        else if (sram_wen)   begin
+            sram_wr_busy <= '1;
+            sram_wr_latency_cnt <= 1'b1;
+        end
+        else if (sram_wr_latency_cnt >= LATENCY)   begin
+            sram_wr_busy <= '0;
+            sram_wr_latency_cnt <= '0;
+        end
+        else if (sram_wr_latency_cnt >= 1'd1)   begin
+            sram_wr_busy <= '1;
+            sram_wr_latency_cnt <= sram_wr_latency_cnt + 1'b1;
+        end
+    end : sram_write_busy_flags_logic
 
     always_comb begin   :   sram_wen_logic
 
