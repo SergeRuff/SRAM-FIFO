@@ -55,6 +55,7 @@ module fifo_dualport_with_pipelined_sram #(
     logic [WIDTH-1:0] out_buf_data_i;
 
     logic [LATENCY_COUNTER_WIDTH - 1:0] sram_wr_latency_cnt;
+    logic [LATENCY_COUNTER_WIDTH - 1:0] sram_rd_latency_cnt;
 
     sram_dualport_latency_5 #(
         .WIDTH ( WIDTH ),
@@ -122,7 +123,26 @@ module fifo_dualport_with_pipelined_sram #(
             sram_wr_busy <= '1;
             sram_wr_latency_cnt <= sram_wr_latency_cnt + 1'b1;
         end
-    end : sram_write_busy_flags_logic
+    end : sram_write_busy_flag_logic
+
+    always_ff @(posedge clk_i) begin    :   sram_read_busy_flag_logic
+        if (rst_i)  begin
+            sram_rd_busy <= '0;
+            sram_rd_latency_cnt <= '0;
+        end
+        else if (sram_ren)   begin
+            sram_rd_busy <= '1;
+            sram_rd_latency_cnt <= 1'b1;
+        end
+        else if (sram_rd_latency_cnt >= LATENCY)   begin
+            sram_rd_busy <= '0;
+            sram_rd_latency_cnt <= '0;
+        end
+        else if (sram_rd_latency_cnt >= 1'd1)   begin
+            sram_rd_busy <= '1;
+            sram_rd_latency_cnt <= sram_rd_latency_cnt + 1'b1;
+        end
+    end : sram_read_busy_flag_logic
 
     always_comb begin   :   sram_wen_logic
 
