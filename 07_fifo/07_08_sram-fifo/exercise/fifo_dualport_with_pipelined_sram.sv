@@ -100,11 +100,11 @@ module fifo_dualport_with_pipelined_sram #(
         .full(output_buf_full)
     );
 
-    always_ff @(posedge clk_i) begin    :   sram_busy_counter
+    always_ff @(posedge clk_i) begin    :   sram_memory_counter
         if (rst_i)                      sram_cnt <= '0;
         else if (sram_wen & ~sram_ren)  sram_cnt <= sram_cnt + 1'b1;
         else if (~sram_wen & sram_ren)  sram_cnt <= sram_cnt - 1'b1;
-    end :   sram_busy_counter
+    end :   sram_memory_counter
 
     always_ff @(posedge clk_i) begin    :   sram_write_busy_flag_logic
         if (rst_i)  begin
