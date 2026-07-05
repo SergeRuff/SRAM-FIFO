@@ -30,6 +30,7 @@ module fifo_dualport_with_pipelined_sram #(
 
     logic total_bypass_mode;
     logic sram_only_bypass_mode;
+    logic output_buffer_write_queue_is_full_flag;
 
     logic sram_wen;
     logic sram_ren;
@@ -37,7 +38,9 @@ module fifo_dualport_with_pipelined_sram #(
     logic sram_full;
     logic sram_empty;
     logic sram_wr_busy;
+    logic sram_wr_ready;
     logic sram_rd_busy;
+    logic sram_rd_ready;
     logic sram_data_vld;
 
     logic input_buf_pop;
@@ -156,10 +159,15 @@ module fifo_dualport_with_pipelined_sram #(
 
     always_comb begin   :   sram_ren_logic
         sram_ren = '0;
-        if (!sram_empty                                               &
-            output_buf_wr_ready                                       &
-            ((output_buf_cnt+sram_reads_in_progress_cnt)<(LATENCY*2)) &
-            !(sram_only_bypass_mode|total_bypass_mode)) begin
+        output_buffer_write_queue_is_full_flag =
+                    (output_buf_cnt+sram_reads_in_progress_cnt-rd_en_i)>=(LATENCY*2);
+
+        sram_rd_ready = !sram_empty                                         &
+                        output_buf_wr_ready                                 &
+                        (!output_buffer_write_queue_is_full_flag |
+                        (sram_full&output_buf_full&output_buf_wr_ready));
+
+        if (sram_rd_ready & !(sram_only_bypass_mode|total_bypass_mode)) begin
             sram_ren = '1;
         end
     end :   sram_ren_logic
@@ -181,7 +189,7 @@ module fifo_dualport_with_pipelined_sram #(
 
     always_comb begin   :   input_buffer_read_logic
         input_buf_pop = '0;
-        input_buf_rd_ready = (!sram_full & !input_buf_empty);
+        input_buf_rd_ready = (!sram_full|sram_rd_ready) & !input_buf_empty;
         if (input_buf_rd_ready) begin
             input_buf_pop = '1;
         end
@@ -233,14 +241,16 @@ module fifo_dualport_with_pipelined_sram #(
 
     always_comb begin   :   empty_flag_logic
         sram_empty = (sram_cnt == '0);
-        empty_o = output_buf_empty;
+        empty_o = output_buf_empty  &
+                  sram_empty        &
+                  input_buf_empty;
     end : empty_flag_logic
 
     always_comb begin   :   full_flag_logic
         sram_full = sram_cnt == COUNTER_WIDTH'(DEPTH);
         full_o = input_buf_full  &
                  sram_full       &
-                 output_buf_full;
+                 (output_buf_full|output_buffer_write_queue_is_full_flag);
     end :   full_flag_logic
 
 endmodule
