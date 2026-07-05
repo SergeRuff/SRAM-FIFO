@@ -130,24 +130,21 @@ module fifo_dualport_with_pipelined_sram #(
         sram_rd_busy = |sram_rd_latency_shift;
     end :   sram_busy_flags_logic
 
-    always_ff @(posedge clk_i) begin    :   sram_read_busy_flag_logic
+    always_ff @(posedge clk_i) begin    :   actions_in_progress_counter
         if (rst_i)  begin
-            sram_rd_busy <= '0;
-            sram_rd_latency_cnt <= '0;
+            sram_reads_in_progress_cnt <= '0;
+            sram_writes_in_progress_cnt <= '0;
         end
-        else if (sram_ren)   begin
-            sram_rd_busy <= '1;
-            sram_rd_latency_cnt <= 1'b1;
+        else    begin
+            sram_reads_in_progress_cnt <= sram_reads_in_progress_cnt +
+                                          LATENCY_COUNTER_WIDTH'(sram_ren) -
+                                          LATENCY_COUNTER_WIDTH'(sram_rd_latency_shift[0]);
+
+            sram_writes_in_progress_cnt <= sram_writes_in_progress_cnt +
+                                           LATENCY_COUNTER_WIDTH'(sram_wen) -
+                                           LATENCY_COUNTER_WIDTH'(sram_wr_latency_shift[0]);
         end
-        else if (sram_rd_latency_cnt >= LATENCY)   begin
-            sram_rd_busy <= '0;
-            sram_rd_latency_cnt <= '0;
-        end
-        else if (sram_rd_latency_cnt >= 1'd1)   begin
-            sram_rd_busy <= '1;
-            sram_rd_latency_cnt <= sram_rd_latency_cnt + 1'b1;
-        end
-    end : sram_read_busy_flag_logic
+    end :   actions_in_progress_counter
 
     always_comb begin   :   sram_wen_logic
         sram_wen = '0;
@@ -158,14 +155,20 @@ module fifo_dualport_with_pipelined_sram #(
     end :   sram_wen_logic
 
     always_comb begin   :   sram_ren_logic
-
+        sram_ren = '0;
+        if (!sram_empty                                               &
+            output_buf_wr_ready                                       &
+            ((output_buf_cnt+sram_reads_in_progress_cnt)<(LATENCY*2)) &
+            !(sram_only_bypass_mode|total_bypass_mode)) begin
+            sram_ren = '1;
+        end
     end :   sram_ren_logic
 
     always_comb begin   :   bypass_mode_logic
         total_bypass_mode = '0;
         sram_only_bypass_mode = '0;
-        if (!output_buf_full & sram_empty & !sram_rd_busy & input_buf_empty)  total_bypass_mode = '1;
-        if (!output_buf_full & sram_empty & !sram_rd_busy & !input_buf_empty) sram_only_bypass_mode = '1;
+        if (!output_buf_full & sram_empty & !sram_wr_busy & !sram_rd_busy & input_buf_empty)  total_bypass_mode = '1;
+        if (!output_buf_full & sram_empty & !sram_wr_busy & !sram_rd_busy & !input_buf_empty) sram_only_bypass_mode = '1;
     end :   bypass_mode_logic
 
     always_comb begin   :   input_buffer_write_logic
