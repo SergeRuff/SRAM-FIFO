@@ -145,7 +145,11 @@ module fifo_dualport_with_pipelined_sram #(
     end : sram_read_busy_flag_logic
 
     always_comb begin   :   sram_wen_logic
-
+        sram_wen = '0;
+        if (input_buf_rd_ready                          &
+            !(sram_only_bypass_mode|total_bypass_mode)) begin
+            sram_wen = '1;
+        end
     end :   sram_wen_logic
 
     always_comb begin   :   sram_ren_logic
