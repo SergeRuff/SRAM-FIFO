@@ -17,12 +17,16 @@ module fifo_dualport_with_pipelined_sram #(
     localparam int COUNTER_WIDTH = $clog2(DEPTH+1);
     localparam int MAX_PTR = POINTER_WIDTH'(DEPTH-1);
     localparam int LATENCY_COUNTER_WIDTH = $clog2(LATENCY);
+    localparam int FIFO_COUNTER_WIDTH = $clog2(LATENCY+1);
 
     logic [COUNTER_WIDTH - 1:0] sram_cnt;
     logic [POINTER_WIDTH - 1:0] wr_ptr;
     logic [POINTER_WIDTH - 1:0] wr_ptr_reg;
     logic [POINTER_WIDTH - 1:0] rd_ptr;
     logic [POINTER_WIDTH - 1:0] rd_ptr_reg;
+
+    logic [FIFO_COUNTER_WIDTH - 1:0] input_buf_cnt;
+    logic [FIFO_COUNTER_WIDTH - 1:0] output_buf_cnt;
 
     logic total_bypass_mode;
     logic sram_only_bypass_mode;
@@ -84,6 +88,7 @@ module fifo_dualport_with_pipelined_sram #(
         .pop(input_buf_pop),
         .write_data(data_i),
         .read_data(input_buf_data_o),
+        .cnt(input_buf_cnt),
         .empty(input_buf_empty),
         .full(input_buf_full)
     );
@@ -98,6 +103,7 @@ module fifo_dualport_with_pipelined_sram #(
         .pop(output_buf_pop),
         .write_data(out_buf_data_i),
         .read_data(data_o),
+        .cnt(output_buf_cnt),
         .empty(output_buf_empty),
         .full(output_buf_full)
     );
