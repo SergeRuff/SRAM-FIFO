@@ -17,7 +17,7 @@ module fifo_dualport_with_pipelined_sram #(
     localparam int COUNTER_WIDTH = $clog2(DEPTH+1);
     localparam int MAX_PTR = POINTER_WIDTH'(DEPTH-1);
     localparam int LATENCY_COUNTER_WIDTH = $clog2(LATENCY);
-    localparam int FIFO_COUNTER_WIDTH = $clog2(LATENCY+1);
+    localparam int FIFO_COUNTER_WIDTH = $clog2((LATENCY*2)+1);
 
     logic [COUNTER_WIDTH - 1:0] sram_cnt;
     logic [POINTER_WIDTH - 1:0] wr_ptr;
