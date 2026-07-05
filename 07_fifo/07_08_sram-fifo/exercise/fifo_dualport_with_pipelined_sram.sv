@@ -167,8 +167,8 @@ module fifo_dualport_with_pipelined_sram #(
     always_comb begin   :   bypass_mode_logic
         total_bypass_mode = '0;
         sram_only_bypass_mode = '0;
-        if (!output_buf_full & sram_empty & !sram_wr_busy & !sram_rd_busy & input_buf_empty)  total_bypass_mode = '1;
-        if (!output_buf_full & sram_empty & !sram_wr_busy & !sram_rd_busy & !input_buf_empty) sram_only_bypass_mode = '1;
+        if (output_buf_wr_ready & sram_empty & !sram_wr_busy & !sram_rd_busy & input_buf_empty)  total_bypass_mode = '1;
+        if (output_buf_wr_ready & sram_empty & !sram_wr_busy & !sram_rd_busy & !input_buf_empty) sram_only_bypass_mode = '1;
     end :   bypass_mode_logic
 
     always_comb begin   :   input_buffer_write_logic
@@ -197,9 +197,9 @@ module fifo_dualport_with_pipelined_sram #(
         output_buf_push = '0;
         output_buf_wr_ready = (output_buf_full & rd_en_i)|(!output_buf_full);
         if (output_buf_wr_ready)    begin
-            if      (sram_data_vld)                          output_buf_push = '1;
-            else if (sram_empty & !input_buf_empty)          output_buf_push = '1;
-            else if (sram_empty & input_buf_empty & wr_en_i) output_buf_push = '1;
+            if      (sram_data_vld)                                              output_buf_push = '1;
+            else if (sram_empty & !input_buf_empty & sram_only_bypass_mode)      output_buf_push = '1;
+            else if (sram_empty & input_buf_empty & wr_en_i & total_bypass_mode) output_buf_push = '1;
         end
     end : output_buffer_write_logic
 
