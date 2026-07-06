@@ -20,7 +20,7 @@ module flip_flop_fifo_with_counter
 
     //------------------------------------------------------------------------
 
-    localparam pointer_width = $clog2 (depth),
+    localparam pointer_width = $clog2 (depth + (depth==1)),
                counter_width = $clog2 (depth + 1);
 
     localparam max_ptr = pointer_width' (depth - 1);
@@ -28,7 +28,6 @@ module flip_flop_fifo_with_counter
     //------------------------------------------------------------------------
 
     logic [pointer_width - 1:0] wr_ptr, rd_ptr;
-    // logic [counter_width - 1:0] cnt;
 
     logic [width - 1:0] data [0: depth - 1];
 
