@@ -1,3 +1,14 @@
-a.out
-dump.vcd
+**/*.out
+**/*.vcd
 fifo_formal_check*/
+import/
+run/
+*.hex
+log.txt
+lint.txt
+/.vscode/
+synth_results.txt
+synth_log.txt
+.project
+.library_mapping.xml
+.settings/
