@@ -156,21 +156,18 @@ module fifo_dualport_with_pipelined_sram #(
 
     always_comb begin   :   sram_wen_logic
         sram_wen = '0;
-        if (input_buf_rd_ready                          &
-            !(sram_only_bypass_mode|total_bypass_mode)) begin
+        sram_wr_ready = input_buf_rd_ready;
+        if (sram_wr_ready & !(sram_only_bypass_mode|total_bypass_mode)) begin
             sram_wen = '1;
         end
     end :   sram_wen_logic
 
     always_comb begin   :   sram_ren_logic
         sram_ren = '0;
-        output_buffer_write_queue_is_full_flag =
-                    (output_buf_cnt+sram_reads_in_progress_cnt-rd_en_i)>=(OUTPUT_BUFFER_DEPTH);
-
-        sram_rd_ready = !sram_empty                                         &
-                        output_buf_wr_ready                                 &
-                        (!output_buffer_write_queue_is_full_flag |
-                        (sram_full&output_buf_full&output_buf_wr_ready));
+        sram_rd_ready = !sram_empty                                    &
+                        output_buf_wr_ready                            &
+                        !output_buffer_write_queue_is_full_flag        |
+                        (sram_full&output_buf_full&output_buf_wr_ready);
 
         if (sram_rd_ready & !(sram_only_bypass_mode|total_bypass_mode)) begin
             sram_ren = '1;
@@ -209,6 +206,9 @@ module fifo_dualport_with_pipelined_sram #(
     always_comb begin   :   output_buffer_write_logic
         output_buf_push = '0;
         output_buf_wr_ready = (output_buf_full & rd_en_i)|(!output_buf_full);
+        output_buffer_write_queue_is_full_flag =
+                    (output_buf_cnt+sram_reads_in_progress_cnt-rd_en_i)>=(OUTPUT_BUFFER_DEPTH);
+
         if (output_buf_wr_ready)    begin
             if      (sram_data_vld)                                              output_buf_push = '1;
             else if (sram_empty & !input_buf_empty & sram_only_bypass_mode)      output_buf_push = '1;
