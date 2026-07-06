@@ -13,11 +13,17 @@ module fifo_dualport_with_pipelined_sram #(
 );
 
     localparam int LATENCY = 5;
-    localparam int MAX_PTR = DEPTH-1;
-    localparam int POINTER_WIDTH = $clog2(DEPTH);
-    localparam int COUNTER_WIDTH = $clog2(DEPTH+1);
+    localparam int MAX_PTR = SRAM_DEPTH-1;
+    localparam int INPUT_BUFFER_DEPTH = 1;
+    localparam int OUTPUT_BUFFER_DEPTH = (LATENCY * 2) - 1;
+    localparam int SRAM_DEPTH = DEPTH -
+                                OUTPUT_BUFFER_DEPTH -
+                                INPUT_BUFFER_DEPTH +
+                                (DEPTH <= (OUTPUT_BUFFER_DEPTH + INPUT_BUFFER_DEPTH));
+    localparam int POINTER_WIDTH = $clog2(SRAM_DEPTH);
+    localparam int COUNTER_WIDTH = $clog2(SRAM_DEPTH+1);
     localparam int LATENCY_COUNTER_WIDTH = $clog2(LATENCY);
-    localparam int FIFO_COUNTER_WIDTH = $clog2((LATENCY*2)+1);
+    localparam int FIFO_COUNTER_WIDTH = $clog2((OUTPUT_BUFFER_DEPTH)+1);
 
     logic [COUNTER_WIDTH - 1:0] sram_cnt;
     logic [POINTER_WIDTH - 1:0] wr_ptr;
@@ -25,7 +31,6 @@ module fifo_dualport_with_pipelined_sram #(
     logic [POINTER_WIDTH - 1:0] rd_ptr;
     logic [POINTER_WIDTH - 1:0] rd_ptr_reg;
 
-    logic [FIFO_COUNTER_WIDTH - 1:0] input_buf_cnt;
     logic [FIFO_COUNTER_WIDTH - 1:0] output_buf_cnt;
 
     logic total_bypass_mode;
@@ -68,7 +73,7 @@ module fifo_dualport_with_pipelined_sram #(
 
     sram_dualport_latency_5 #(
         .WIDTH ( WIDTH ),
-        .DEPTH ( DEPTH )
+        .DEPTH ( SRAM_DEPTH )
     ) i_mem (
         .clk_i   (clk_i),
         .rst_i   (rst_i),
@@ -83,7 +88,7 @@ module fifo_dualport_with_pipelined_sram #(
 
     flip_flop_fifo_with_counter #(
         .width(WIDTH),
-        .depth(LATENCY*2)
+        .depth(1)
     ) buffer_in (
         .clk(clk_i),
         .rst(rst_i),
@@ -91,14 +96,14 @@ module fifo_dualport_with_pipelined_sram #(
         .pop(input_buf_pop),
         .write_data(data_i),
         .read_data(input_buf_data_o),
-        .cnt(input_buf_cnt),
+        .cnt(),
         .empty(input_buf_empty),
         .full(input_buf_full)
     );
 
     flip_flop_fifo_with_counter #(
         .width(WIDTH),
-        .depth(LATENCY*2)
+        .depth(OUTPUT_BUFFER_DEPTH)
     ) buffer_out (
         .clk(clk_i),
         .rst(rst_i),
@@ -160,7 +165,7 @@ module fifo_dualport_with_pipelined_sram #(
     always_comb begin   :   sram_ren_logic
         sram_ren = '0;
         output_buffer_write_queue_is_full_flag =
-                    (output_buf_cnt+sram_reads_in_progress_cnt-rd_en_i)>=(LATENCY*2);
+                    (output_buf_cnt+sram_reads_in_progress_cnt-rd_en_i)>=(OUTPUT_BUFFER_DEPTH);
 
         sram_rd_ready = !sram_empty                                         &
                         output_buf_wr_ready                                 &
@@ -247,7 +252,7 @@ module fifo_dualport_with_pipelined_sram #(
     end : empty_flag_logic
 
     always_comb begin   :   full_flag_logic
-        sram_full = sram_cnt == COUNTER_WIDTH'(DEPTH);
+        sram_full = sram_cnt == COUNTER_WIDTH'(SRAM_DEPTH);
         full_o = input_buf_full  &
                  sram_full       &
                  (output_buf_full|output_buffer_write_queue_is_full_flag);
