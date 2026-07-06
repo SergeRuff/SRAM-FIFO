@@ -8,7 +8,7 @@ module fifo_tb();
     localparam PUSH_DELAY_MAX = 10;
     localparam POP_DELAY_MIN  = 0;
     localparam POP_DELAY_MAX  = 10;
-    localparam CHECKS         = 1000;
+    localparam CHECKS         = 1_000_000;
 
     logic                clk;
     logic                rst;
