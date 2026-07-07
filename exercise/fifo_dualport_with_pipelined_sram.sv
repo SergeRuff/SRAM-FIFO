@@ -177,9 +177,9 @@ module fifo_dualport_with_pipelined_sram #(
 
     always_comb begin   :   sram_ren_logic
         sram_ren = '0;
-        sram_rd_ready = !sram_empty                                    &
-                        output_buf_wr_ready                            &
-                        !output_buffer_write_queue_is_full_flag        |
+        sram_rd_ready = !((sram_cnt-sram_writes_in_progress_cnt)=='0)   &
+                        output_buf_wr_ready                             &
+                        !output_buffer_write_queue_is_full_flag         |
                         (sram_full&output_buf_full&output_buf_wr_ready);
 
         if (sram_rd_ready & !(sram_only_bypass_mode|total_bypass_mode)) begin
