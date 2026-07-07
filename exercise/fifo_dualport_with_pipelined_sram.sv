@@ -1,8 +1,11 @@
+import boolean_type_pkg::*;
+
 module fifo_dualport_with_pipelined_sram #(
-    parameter WIDTH         = 8,
-    parameter DEPTH         = 8,
-    parameter READ_LATENCY  = 5,
-    parameter WRITE_LATENCY = 1
+    parameter        WIDTH         = 8,
+    parameter        DEPTH         = 8,
+    parameter        READ_LATENCY  = 5,
+    parameter        WRITE_LATENCY = 1,
+    parameter bool_t ALLOW_BYPASS = TRUE
 ) (
     input  logic             clk_i,
     input  logic             rst_i,
@@ -190,8 +193,19 @@ module fifo_dualport_with_pipelined_sram #(
     always_comb begin   :   bypass_mode_logic
         total_bypass_mode = '0;
         sram_only_bypass_mode = '0;
-        if (output_buf_wr_ready & sram_empty & !sram_wr_busy & !sram_rd_busy & input_buf_empty)  total_bypass_mode = '1;
-        if (output_buf_wr_ready & sram_empty & !sram_wr_busy & !sram_rd_busy & !input_buf_empty) sram_only_bypass_mode = '1;
+        if (ALLOW_BYPASS)   begin
+            if (output_buf_wr_ready &
+                sram_empty          &
+                !sram_wr_busy       &
+                !sram_rd_busy       &
+                input_buf_empty)    total_bypass_mode = '1;
+
+            if (output_buf_wr_ready &
+                sram_empty          &
+                !sram_wr_busy       &
+                !sram_rd_busy       &
+                !input_buf_empty)   sram_only_bypass_mode = '1;
+        end
     end :   bypass_mode_logic
 
     always_comb begin   :   input_buffer_write_logic
