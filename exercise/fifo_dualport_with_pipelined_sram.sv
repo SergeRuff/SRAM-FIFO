@@ -5,7 +5,7 @@ module fifo_dualport_with_pipelined_sram #(
     parameter        DEPTH         = 8,
     parameter        READ_LATENCY  = 5,
     parameter        WRITE_LATENCY = 1,
-    parameter bool_t ALLOW_BYPASS = TRUE
+    parameter bool_t ALLOW_BYPASS  = TRUE
 ) (
     input  logic             clk_i,
     input  logic             rst_i,
@@ -33,9 +33,7 @@ module fifo_dualport_with_pipelined_sram #(
 
     logic [COUNTER_WIDTH - 1:0] sram_cnt;
     logic [POINTER_WIDTH - 1:0] wr_ptr;
-    logic [POINTER_WIDTH - 1:0] wr_ptr_reg;
     logic [POINTER_WIDTH - 1:0] rd_ptr;
-    logic [POINTER_WIDTH - 1:0] rd_ptr_reg;
 
     logic [INPUT_FIFO_COUNTER_WIDTH - 1:0] input_buf_cnt;
     logic [OUTPUT_FIFO_COUNTER_WIDTH - 1:0] output_buf_cnt;
@@ -88,8 +86,8 @@ module fifo_dualport_with_pipelined_sram #(
         .rst_i   (rst_i),
         .wen_i   (sram_wen),
         .ren_i   (sram_ren),
-        .waddr_i (wr_ptr_reg),
-        .raddr_i (rd_ptr_reg),
+        .waddr_i (wr_ptr),
+        .raddr_i (rd_ptr),
         .data_i  (input_buf_data_o),
         .data_o  (sram_data_o),
         .vld_o   (sram_data_vld)
@@ -156,13 +154,13 @@ module fifo_dualport_with_pipelined_sram #(
 
     always_ff @(posedge clk_i) begin    :   actions_in_progress_counter
         if (rst_i)  begin
-            sram_reads_in_progress_cnt <= '0;
+            sram_reads_in_progress_cnt  <= '0;
             sram_writes_in_progress_cnt <= '0;
         end
         else    begin
-            sram_reads_in_progress_cnt <= sram_reads_in_progress_cnt +
-                                          READ_LATENCY_COUNTER_WIDTH'(sram_ren) -
-                                          READ_LATENCY_COUNTER_WIDTH'(sram_rd_done);
+            sram_reads_in_progress_cnt  <= sram_reads_in_progress_cnt +
+                                           READ_LATENCY_COUNTER_WIDTH'(sram_ren) -
+                                           READ_LATENCY_COUNTER_WIDTH'(sram_rd_done);
 
             sram_writes_in_progress_cnt <= sram_writes_in_progress_cnt +
                                            WRITE_LATENCY_COUNTER_WIDTH'(sram_wen) -
@@ -251,24 +249,16 @@ module fifo_dualport_with_pipelined_sram #(
         end
     end : output_buffer_read_logic
 
-    always_comb begin   :   write_pointer_logic
-                        wr_ptr = wr_ptr_reg;
-        if (sram_wen)   wr_ptr = (wr_ptr==MAX_PTR)? '0 : wr_ptr + 1;
-    end :   write_pointer_logic
-
     always_ff @(posedge clk_i)  begin   :   write_pointer_register
-        if (rst_i)  wr_ptr_reg <= '0;
-        else        wr_ptr_reg <= wr_ptr;
+        if (rst_i)                     wr_ptr <= '0;
+        else if (wr_ptr > MAX_PTR) wr_ptr <= '0;
+        else if (sram_wen)             wr_ptr <= wr_ptr + 1'b1;
     end :   write_pointer_register
 
-    always_comb begin   :   read_pointer_logic
-                        rd_ptr = rd_ptr_reg;
-        if (sram_ren)   rd_ptr = (rd_ptr==MAX_PTR)? '0 : rd_ptr + 1;
-    end :   read_pointer_logic
-
     always_ff @(posedge clk_i)  begin   :   read_pointer_register
-        if (rst_i)  rd_ptr_reg <= '0;
-        else        rd_ptr_reg <= rd_ptr;
+        if (rst_i)                     rd_ptr <= '0;
+        else if (rd_ptr > MAX_PTR) rd_ptr <= '0;
+        else if (sram_ren)             rd_ptr <= rd_ptr + 1'b1;
     end :   read_pointer_register
 
     always_comb begin   :   empty_flag_logic
