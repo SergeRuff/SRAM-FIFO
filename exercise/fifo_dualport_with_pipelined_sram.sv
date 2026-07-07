@@ -15,7 +15,7 @@ module fifo_dualport_with_pipelined_sram #(
     localparam int LATENCY = 5;
     localparam int MAX_PTR = SRAM_DEPTH-1;
     localparam int INPUT_BUFFER_DEPTH = 1;
-    localparam int OUTPUT_BUFFER_DEPTH = (LATENCY * 2) - 1;
+    localparam int OUTPUT_BUFFER_DEPTH = (LATENCY * 2) - 2;
     localparam int SRAM_DEPTH = DEPTH -
                                 OUTPUT_BUFFER_DEPTH -
                                 INPUT_BUFFER_DEPTH +
