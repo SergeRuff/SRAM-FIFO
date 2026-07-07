@@ -12,18 +12,21 @@ module fifo_dualport_with_pipelined_sram #(
     output logic             full_o
 );
 
-    localparam int LATENCY = 5;
+    localparam int READ_LATENCY = 5;
+    localparam int WRITE_LATENCY = 1;
     localparam int MAX_PTR = SRAM_DEPTH-1;
-    localparam int INPUT_BUFFER_DEPTH = 1;
-    localparam int OUTPUT_BUFFER_DEPTH = (LATENCY * 2) - 2;
+    localparam int INPUT_BUFFER_DEPTH = WRITE_LATENCY;
+    localparam int OUTPUT_BUFFER_DEPTH = (READ_LATENCY + WRITE_LATENCY);
     localparam int SRAM_DEPTH = DEPTH -
                                 OUTPUT_BUFFER_DEPTH -
                                 INPUT_BUFFER_DEPTH +
                                 (DEPTH <= (OUTPUT_BUFFER_DEPTH + INPUT_BUFFER_DEPTH));
     localparam int POINTER_WIDTH = $clog2(SRAM_DEPTH);
     localparam int COUNTER_WIDTH = $clog2(SRAM_DEPTH+1);
-    localparam int LATENCY_COUNTER_WIDTH = $clog2(LATENCY);
-    localparam int FIFO_COUNTER_WIDTH = $clog2((OUTPUT_BUFFER_DEPTH)+1);
+    localparam int READ_LATENCY_COUNTER_WIDTH = $clog2(READ_LATENCY+1);
+    localparam int WRITE_LATENCY_COUNTER_WIDTH = $clog2(WRITE_LATENCY+1);
+    localparam int INPUT_FIFO_COUNTER_WIDTH = $clog2((INPUT_BUFFER_DEPTH)+1);
+    localparam int OUTPUT_FIFO_COUNTER_WIDTH = $clog2((OUTPUT_BUFFER_DEPTH)+1);
 
     logic [COUNTER_WIDTH - 1:0] sram_cnt;
     logic [POINTER_WIDTH - 1:0] wr_ptr;
@@ -31,7 +34,8 @@ module fifo_dualport_with_pipelined_sram #(
     logic [POINTER_WIDTH - 1:0] rd_ptr;
     logic [POINTER_WIDTH - 1:0] rd_ptr_reg;
 
-    logic [FIFO_COUNTER_WIDTH - 1:0] output_buf_cnt;
+    logic [INPUT_FIFO_COUNTER_WIDTH - 1:0] input_buf_cnt;
+    logic [OUTPUT_FIFO_COUNTER_WIDTH - 1:0] output_buf_cnt;
 
     logic total_bypass_mode;
     logic sram_only_bypass_mode;
@@ -67,11 +71,11 @@ module fifo_dualport_with_pipelined_sram #(
     logic [WIDTH-1:0] out_buf_data_i;
 
     logic sram_wr_done;
-    logic [LATENCY-1:0] sram_wr_latency_shift;
-    logic [LATENCY_COUNTER_WIDTH - 1:0] sram_writes_in_progress_cnt;
+    logic [WRITE_LATENCY-1:0] sram_wr_latency_shift;
+    logic [WRITE_LATENCY_COUNTER_WIDTH - 1:0] sram_writes_in_progress_cnt;
     logic sram_rd_done;
-    logic [LATENCY-1:0] sram_rd_latency_shift;
-    logic [LATENCY_COUNTER_WIDTH - 1:0] sram_reads_in_progress_cnt;
+    logic [READ_LATENCY-1:0] sram_rd_latency_shift;
+    logic [READ_LATENCY_COUNTER_WIDTH - 1:0] sram_reads_in_progress_cnt;
 
     sram_dualport_latency_5 #(
         .WIDTH ( WIDTH ),
@@ -90,7 +94,7 @@ module fifo_dualport_with_pipelined_sram #(
 
     flip_flop_fifo_with_counter #(
         .width(WIDTH),
-        .depth(1)
+        .depth(INPUT_BUFFER_DEPTH)
     ) buffer_in (
         .clk(clk_i),
         .rst(rst_i),
@@ -98,7 +102,7 @@ module fifo_dualport_with_pipelined_sram #(
         .pop(input_buf_pop),
         .write_data(data_i),
         .read_data(input_buf_data_o),
-        .cnt(),
+        .cnt(input_buf_cnt),
         .empty(input_buf_empty),
         .full(input_buf_full)
     );
@@ -130,10 +134,13 @@ module fifo_dualport_with_pipelined_sram #(
             sram_rd_latency_shift <= '0;
         end
         else begin
-            sram_wr_latency_shift[LATENCY-1:0]
-                                    <= {sram_wen, sram_wr_latency_shift[LATENCY-1:1]};
-            sram_rd_latency_shift[LATENCY-1:0]
-                                    <= {sram_ren, sram_rd_latency_shift[LATENCY-1:1]};
+            sram_wr_latency_shift[WRITE_LATENCY-1:0] <=
+                            WRITE_LATENCY'(sram_wen << (WRITE_LATENCY-1))
+                            + WRITE_LATENCY'(sram_wr_latency_shift >> 1);
+
+            sram_rd_latency_shift[READ_LATENCY-1:0] <=
+                            READ_LATENCY'(sram_ren << (READ_LATENCY-1))
+                            + READ_LATENCY'(sram_rd_latency_shift >> 1);
         end
     end : sram_shift_counters_logic
     assign sram_wr_done = sram_wr_latency_shift[0];
@@ -151,12 +158,12 @@ module fifo_dualport_with_pipelined_sram #(
         end
         else    begin
             sram_reads_in_progress_cnt <= sram_reads_in_progress_cnt +
-                                          LATENCY_COUNTER_WIDTH'(sram_ren) -
-                                          LATENCY_COUNTER_WIDTH'(sram_rd_done);
+                                          READ_LATENCY_COUNTER_WIDTH'(sram_ren) -
+                                          READ_LATENCY_COUNTER_WIDTH'(sram_rd_done);
 
             sram_writes_in_progress_cnt <= sram_writes_in_progress_cnt +
-                                           LATENCY_COUNTER_WIDTH'(sram_wen) -
-                                           LATENCY_COUNTER_WIDTH'(sram_wr_done);
+                                           WRITE_LATENCY_COUNTER_WIDTH'(sram_wen) -
+                                           WRITE_LATENCY_COUNTER_WIDTH'(sram_wr_done);
         end
     end :   actions_in_progress_counter
 
