@@ -66,8 +66,10 @@ module fifo_dualport_with_pipelined_sram #(
     logic [WIDTH-1:0] input_buf_data_o;
     logic [WIDTH-1:0] out_buf_data_i;
 
+    logic sram_wr_done;
     logic [LATENCY-1:0] sram_wr_latency_shift;
     logic [LATENCY_COUNTER_WIDTH - 1:0] sram_writes_in_progress_cnt;
+    logic sram_rd_done;
     logic [LATENCY-1:0] sram_rd_latency_shift;
     logic [LATENCY_COUNTER_WIDTH - 1:0] sram_reads_in_progress_cnt;
 
@@ -128,10 +130,14 @@ module fifo_dualport_with_pipelined_sram #(
             sram_rd_latency_shift <= '0;
         end
         else begin
-            sram_wr_latency_shift <= {sram_wen, sram_wr_latency_shift[LATENCY-1:1]};
-            sram_rd_latency_shift <= {sram_ren, sram_rd_latency_shift[LATENCY-1:1]};
+            sram_wr_latency_shift[LATENCY-1:0]
+                                    <= {sram_wen, sram_wr_latency_shift[LATENCY-1:1]};
+            sram_rd_latency_shift[LATENCY-1:0]
+                                    <= {sram_ren, sram_rd_latency_shift[LATENCY-1:1]};
         end
     end : sram_shift_counters_logic
+    assign sram_wr_done = sram_wr_latency_shift[0];
+    assign sram_rd_done = sram_rd_latency_shift[0];
 
     always_comb begin   :   sram_busy_flags_logic
         sram_wr_busy = |sram_wr_latency_shift;
@@ -146,11 +152,11 @@ module fifo_dualport_with_pipelined_sram #(
         else    begin
             sram_reads_in_progress_cnt <= sram_reads_in_progress_cnt +
                                           LATENCY_COUNTER_WIDTH'(sram_ren) -
-                                          LATENCY_COUNTER_WIDTH'(sram_rd_latency_shift[0]);
+                                          LATENCY_COUNTER_WIDTH'(sram_rd_done);
 
             sram_writes_in_progress_cnt <= sram_writes_in_progress_cnt +
                                            LATENCY_COUNTER_WIDTH'(sram_wen) -
-                                           LATENCY_COUNTER_WIDTH'(sram_wr_latency_shift[0]);
+                                           LATENCY_COUNTER_WIDTH'(sram_wr_done);
         end
     end :   actions_in_progress_counter
 
