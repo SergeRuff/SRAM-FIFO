@@ -1,6 +1,8 @@
 module fifo_dualport_with_pipelined_sram #(
-    parameter WIDTH = 8,
-    parameter DEPTH = 8
+    parameter WIDTH         = 8,
+    parameter DEPTH         = 8,
+    parameter READ_LATENCY  = 5,
+    parameter WRITE_LATENCY = 1
 ) (
     input  logic             clk_i,
     input  logic             rst_i,
@@ -12,15 +14,13 @@ module fifo_dualport_with_pipelined_sram #(
     output logic             full_o
 );
 
-    localparam int READ_LATENCY = 5;
-    localparam int WRITE_LATENCY = 1;
-    localparam int MAX_PTR = SRAM_DEPTH-1;
     localparam int INPUT_BUFFER_DEPTH = WRITE_LATENCY;
     localparam int OUTPUT_BUFFER_DEPTH = (READ_LATENCY + WRITE_LATENCY);
     localparam int SRAM_DEPTH = DEPTH -
                                 OUTPUT_BUFFER_DEPTH -
                                 INPUT_BUFFER_DEPTH +
                                 (DEPTH <= (OUTPUT_BUFFER_DEPTH + INPUT_BUFFER_DEPTH));
+    localparam int MAX_PTR = SRAM_DEPTH-1;
     localparam int POINTER_WIDTH = $clog2(SRAM_DEPTH);
     localparam int COUNTER_WIDTH = $clog2(SRAM_DEPTH+1);
     localparam int READ_LATENCY_COUNTER_WIDTH = $clog2(READ_LATENCY+1);
