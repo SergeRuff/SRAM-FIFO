@@ -18,7 +18,7 @@ module fifo_dualport_with_pipelined_sram #(
 );
 
     localparam int INPUT_BUFFER_DEPTH = WRITE_LATENCY;
-    localparam int OUTPUT_BUFFER_DEPTH = (READ_LATENCY + WRITE_LATENCY);
+    localparam int OUTPUT_BUFFER_DEPTH = (READ_LATENCY + WRITE_LATENCY + 2);
     localparam int SRAM_DEPTH = DEPTH -
                                 OUTPUT_BUFFER_DEPTH -
                                 INPUT_BUFFER_DEPTH +
@@ -250,15 +250,13 @@ module fifo_dualport_with_pipelined_sram #(
     end : output_buffer_read_logic
 
     always_ff @(posedge clk_i)  begin   :   write_pointer_register
-        if (rst_i)                     wr_ptr <= '0;
-        else if (wr_ptr > MAX_PTR) wr_ptr <= '0;
-        else if (sram_wen)             wr_ptr <= wr_ptr + 1'b1;
+        if (rst_i)         wr_ptr <= '0;
+        else if (sram_wen) wr_ptr <= (wr_ptr >= MAX_PTR)? '0 : wr_ptr + 1'b1;
     end :   write_pointer_register
 
     always_ff @(posedge clk_i)  begin   :   read_pointer_register
-        if (rst_i)                     rd_ptr <= '0;
-        else if (rd_ptr > MAX_PTR) rd_ptr <= '0;
-        else if (sram_ren)             rd_ptr <= rd_ptr + 1'b1;
+        if (rst_i)         rd_ptr <= '0;
+        else if (sram_ren) rd_ptr <= (rd_ptr >= MAX_PTR)? '0 : rd_ptr + 1'b1;
     end :   read_pointer_register
 
     always_comb begin   :   empty_flag_logic
