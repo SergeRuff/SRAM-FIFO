@@ -1,11 +1,12 @@
 import boolean_type_pkg::*;
 
 module fifo_dualport_with_pipelined_sram #(
-    parameter        WIDTH         = 8,
-    parameter        DEPTH         = 8,
-    parameter        READ_LATENCY  = 5,
-    parameter        WRITE_LATENCY = 1,
-    parameter bool_t ALLOW_BYPASS  = TRUE
+    parameter        WIDTH               = 8,
+    parameter        DEPTH               = 8,
+    parameter        READ_LATENCY        = 5,
+    parameter        WRITE_LATENCY       = 1,
+    parameter bool_t ALLOW_BYPASS        = TRUE,
+    parameter bool_t EMPTY_FLAG_IS_TOTAL = TRUE
 ) (
     input  logic             clk_i,
     input  logic             rst_i,
@@ -261,9 +262,9 @@ module fifo_dualport_with_pipelined_sram #(
 
     always_comb begin   :   empty_flag_logic
         sram_empty = (sram_cnt == '0);
-        empty_o = output_buf_empty  &
-                  sram_empty        &
-                  input_buf_empty;
+        empty_o = (!EMPTY_FLAG_IS_TOTAL)? output_buf_empty : output_buf_empty  &
+                                                             sram_empty        &
+                                                             input_buf_empty;
     end : empty_flag_logic
 
     always_comb begin   :   full_flag_logic
