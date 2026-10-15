@@ -4,10 +4,10 @@ This repository contains examples of SRAM based FIFO approaches.
 
 ## Exercise
 
-Implement a FIFO based on pipelined SRAM behavioural model. Write your
-implementation in `fifo_dualport_with_pipelined_sram`, then you can run a script
-`run_tb.sh` to check your solution. If you are on Windows, just copy 2 commands
-from the script to the terminal.
+In `exercise` directory implement a FIFO based on pipelined SRAM behavioural
+model. Write your implementation in `fifo_dualport_with_pipelined_sram`, then
+you can run a script: `run_tb.sh` for Linux or `run_tb.bat` for Widnows to
+check your solution.
 
 Bevare that by default testbench only runs 1000 tests. Such complicated FIFO design
 might hide issues that are not covered by that basic test. I suggest to increase
